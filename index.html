@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Secure Healthcare Assistant 🔐</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: #0f172a;
+      color: #e5e7eb;
+      display: flex;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .app {
+      max-width: 960px;
+      width: 100%;
+      background: #020617;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+      border: 1px solid #1f2937;
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 1.8rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h1 span.logo {
+      font-size: 1.4rem;
+    }
+
+    .subtitle {
+      margin-bottom: 20px;
+      color: #9ca3af;
+      font-size: 0.95rem;
+    }
+
+    label {
+      font-size: 0.9rem;
+      color: #9ca3af;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #4b5563;
+      background: #020617;
+      color: #f9fafb;
+      outline: none;
+      font-size: 0.95rem;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.5);
+    }
+
+    .row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .row > div {
+      flex: 1;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      margin: 16px 0 24px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, #38bdf8, #0369a1);
+      color: #0b1120;
+      box-shadow: 0 10px 25px rgba(56, 189, 248, 0.35);
+    }
+
+    button.secondary {
+      background: #111827;
+      color: #e5e7eb;
+      border: 1px solid #4b5563;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+
+    button:not(:disabled):hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 30px rgba(56, 189, 248, 0.45);
+    }
+
+    .status {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      min-height: 18px;
+      margin-bottom: 8px;
+    }
+
+    .columns {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .col {
+      flex: 1;
+      min-width: 260px;
+    }
+
+    .card {
+      background: #020617;
+      border-radius: 12px;
+      border: 1px solid #1f2937;
+      padding: 16px;
+      max-height: 420px;
+      overflow: auto;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      font-size: 1rem;
+      color: #e5e7eb;
+      border-bottom: 1px solid #1f2937;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+    }
+
+    .answer-text {
+      white-space: pre-wrap;
+      font-size: 0.95rem;
+    }
+
+    .note {
+      font-size: 0.85rem;
+      background: #020617;
+      border-radius: 8px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      border: 1px solid #1f2937;
+      white-space: pre-wrap;
+    }
+
+    .chip {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #111827;
+      color: #9ca3af;
+      font-size: 0.75rem;
+      margin-left: 4px;
+    }
+
+    .small {
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+
+    .footer {
+      margin-top: 16px;
+      font-size: 0.8rem;
+      color: #4b5563;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>
+      <span class="logo">🩺</span>
+      Secure Healthcare Assistant
+      <span class="chip">CyborgDB + Gemini</span>
+    </h1>
+    <div class="subtitle">
+      Ask patient-specific questions using encrypted vector search.<br />
+      This UI talks to your FastAPI backend at <code>http://127.0.0.1:8000</code>.
+    </div>
+
+    <div class="row">
+      <div>
+        <label for="patientId">Patient ID</label>
+        <input id="patientId" type="text" value="P001" />
+      </div>
+      <div style="max-width: 120px;">
+        <label for="topK">Top K</label>
+        <input id="topK" type="number" min="1" max="10" value="3" />
+      </div>
+    </div>
+
+    <div>
+      <label for="question">Doctor's question</label>
+      <textarea id="question">What was the last recommended treatment?</textarea>
+    </div>
+
+    <div class="btn-row">
+      <button id="btnIngest" class="secondary" type="button">
+        ⚙️ Load sample notes (ingest)
+      </button>
+      <button id="btnAsk" class="primary" type="button">
+        💬 Ask assistant
+      </button>
+    </div>
+
+    <div id="status" class="status"></div>
+
+    <div class="columns">
+      <div class="col">
+        <div class="card">
+          <h2>Answer</h2>
+          <div id="answer" class="answer-text small">
+            Use "Load sample notes" first, then click "Ask assistant".
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card">
+          <h2>Supporting notes <span class="chip">encrypted context</span></h2>
+          <div id="notes"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      Demo only – all patient data in this app is synthetic.
+    </div>
+  </div>
+
+  <script>
+    // 👇 THIS is where frontend is linked to your backend
+    const API_BASE = "http://127.0.0.1:8000";
+
+    const statusEl = document.getElementById("status");
+    const answerEl = document.getElementById("answer");
+    const notesEl = document.getElementById("notes");
+    const btnIngest = document.getElementById("btnIngest");
+    const btnAsk = document.getElementById("btnAsk");
+
+    function setStatus(message) {
+      statusEl.textContent = message || "";
+    }
+
+    function setLoading(isLoading) {
+      btnIngest.disabled = isLoading;
+      btnAsk.disabled = isLoading;
+    }
+
+    // Call POST /ingest on backend
+    async function ingestSampleNotes() {
+      setLoading(true);
+      setStatus("Ingesting synthetic notes into encrypted index...");
+
+      const payload = {
+        notes: [
+          {
+            patient_id: "P001",
+            text:
+              "Patient P001, first visit. Diagnosed with type 2 diabetes. " +
+              "Started Metformin 500 mg twice daily."
+          },
+          {
+            patient_id: "P001",
+            text:
+              "Patient P001, second visit. Blood sugar still high. " +
+              "Last recommended treatment: increase Metformin to 1000 mg twice daily " +
+              "and add 30 minutes of brisk walking in the evening."
+          },
+          {
+            patient_id: "P002",
+            text:
+              "Patient P002, follow-up. Hypertension controlled. " +
+              "Continue current medication."
+          }
+        ]
+      };
+
+      try {
+        const res = await fetch(API_BASE + "/ingest", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text || "Ingest failed");
+        }
+
+        const data = await res.json();
+        setStatus(`Ingested ${data.ingested} notes into encrypted index.`);
+      } catch (err) {
+        console.error(err);
+        setStatus("Error during ingest: " + err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    // Call POST /rag-answer on backend
+    async function askQuestion() {
+      const patientId = document.getElementById("patientId").value.trim();
+      const topK = parseInt(document.getElementById("topK").value, 10) || 3;
+      const question = document.getElementById("question").value.trim();
+
+      if (!question) {
+        alert("Please enter a question.");
+        return;
+      }
+
+      setLoading(true);
+      setStatus("Running encrypted search + RAG…");
+
+      answerEl.textContent = "";
+      notesEl.innerHTML = "";
+
+      const payload = {
+        question,
+        patient_id: patientId || null,
+        top_k: topK
+      };
+
+      try {
+        const res = await fetch(API_BASE + "/rag-answer", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.detail || "Request failed");
+        }
+
+        answerEl.textContent = data.answer || "(No answer returned)";
+
+        const notes = data.supporting_notes || [];
+        notesEl.innerHTML = "";
+        if (notes.length === 0) {
+          notesEl.innerHTML = '<div class="small">No supporting notes found.</div>';
+        } else {
+          notes.forEach((n) => {
+            const div = document.createElement("div");
+            div.className = "note";
+            div.textContent = n;
+            notesEl.appendChild(div);
+          });
+        }
+
+        setStatus("Done ✅ (encrypted vector search completed)");
+      } catch (err) {
+        console.error(err);
+        setStatus("Error: " + err.message);
+        answerEl.textContent = "An error occurred. Check console for details.";
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    btnIngest.addEventListener("click", ingestSampleNotes);
+    btnAsk.addEventListener("click", askQuestion);
+  </script>
+</body>
+</html>
